@@ -11,17 +11,21 @@ These instructions will get you a copy of the project up and running on your loc
 What things you need to install the software and how to install them
 
 ```
-Give examples
+Perl version 5.10.1 or greater
+R    version 3.0.1 or greater
+R    Tree Package
+Linux Operating System
 ```
 
 ### Installing
 
-A step by step series of examples that tell you have to get a development env running
+Download the repository and place it in desired directory
+The repository will be in a folder called VCF2CNA
 
-Say what the step will be
+From the VCF2CNA Folder run the extraction command
 
 ```
-Give the example
+bash extract.sh
 ```
 
 And repeat
