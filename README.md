@@ -34,6 +34,7 @@ To run the application use the run.sh bash script
 
 ```
 bash run.sh [FILENAME][FILE_DIR][SEQ_TYPE (EXOME or WHOLEGENOME)
+bash run.sh TEST.high_20.out test EXOME
 ```
 
 ### Additional Information
