@@ -63,7 +63,7 @@ HEADER="$WORK_DIR/header.txt"
 
 # determine input filetype
 head -n 1 $FILE_DIR/$FILENAME > $HEADER
-FILETYPE=$(perl ${BASE_DIR}/programs/file_type.pl $HEADER)
+FILETYPE=$(perl ${BASE_DIR}/source/file_type.pl $HEADER)
 echo "$FILETYPE"
 
 # parse files based on filetype and generate snvcounts_outputfile with median_outputfile
@@ -73,7 +73,7 @@ then
 	then
 		error_exit "For VCF_FILES you must specify pair order: TN or NT! aborting."
 	fi
-	VCF_SNPCOUNT=$(perl ${BASE_DIR}/programs/vcf_parser_4.1.pl $FILE_DIR/$FILENAME $VCF_ORDER $WORK_DIR)
+	VCF_SNPCOUNT=$(perl ${BASE_DIR}/source/vcf_parser_4.1.pl $FILE_DIR/$FILENAME $VCF_ORDER $WORK_DIR)
 	grep 'Pos' $WORK_DIR/snvcounts_outputfile > $WORK_DIR/sort_file
 	grep -v -E 'X|Y|Pos' $WORK_DIR/snvcounts_outputfile | sort -n -k1.4 -k2 >> $WORK_DIR/sort_file
 	grep -E 'X|Y' $WORK_DIR/snvcounts_outputfile | sort -t$'\t' -k1.4,1d -k2,2n >> $WORK_DIR/sort_file
@@ -86,7 +86,7 @@ then
 	cp $FILE_DIR/$FILENAME $WORK_DIR/snvcounts_outputfile
 	HEADER_LINE="Chr\tPos\tTumorMutant\tTumorTotal\tNormalMutant\tNormalTotal"
 	sed -i "1s/.*/$HEADER_LINE/" $WORK_DIR/snvcounts_outputfile
-	SJ_MAF_MEDIAN=$(perl ${BASE_DIR}/programs/sj_maf_parser.pl $WORK_DIR/snvcounts_outputfile > $WORK_DIR/median_outputfile)
+	SJ_MAF_MEDIAN=$(perl ${BASE_DIR}/source/sj_maf_parser.pl $WORK_DIR/snvcounts_outputfile > $WORK_DIR/median_outputfile)
 fi
 
 if [[ "$FILETYPE" == "HIGH20" || "$FILETYPE" == "MAF" ]];
@@ -107,7 +107,7 @@ fi
 echo "running VCF2CNA script"
 arguments="SAMPLE=\"$FILENAME\" forced=T hg18=F working_directory=\"$WORK_DIR\"";
 
-if R --vanilla --slave --args $arguments < ${BASE_DIR}/programs/CONSERTING-TARGET.R; then
+if R --vanilla --slave --args $arguments < ${BASE_DIR}/source/CONSERTING-TARGET.R; then
 	echo "Successfully ran segment analysis"
 else
 	error_exit "CONSERTING-TARGET.R crashed! aborting."
@@ -127,14 +127,14 @@ LOH=$LOH1$LOH2
 
 IMAGE_OUTPUT="$WORK_DIR/Result/$SAMPNAME.jpg"
 
-if Rscript ${BASE_DIR}/programs/ai_plot_cnv.r $CHR_SIZES $SNVCOUNTS_OUT $MAPABILITY $LOH $IMAGE_OUTPUT; then
+if Rscript ${BASE_DIR}/source/ai_plot_cnv.r $CHR_SIZES $SNVCOUNTS_OUT $MAPABILITY $LOH $IMAGE_OUTPUT; then
 	echo "Successfully ran plotting algorithm"
 else
 	error_exit "ai_plot_cnv.r crashed! aborting."
 fi
 
 echo "computing b-allele frequencies"
-if perl ${BASE_DIR}/programs/snv2baf.pl ${WORK_DIR}/snvcounts_outputfile > $WORK_DIR/$SAMPNAME.germ.baf; then
+if perl ${BASE_DIR}/source/snv2baf.pl ${WORK_DIR}/snvcounts_outputfile > $WORK_DIR/$SAMPNAME.germ.baf; then
 	echo "Successfully computed b-allele frequencies"
 else
 	error_exit "BAF.pl crashed! aborting."
@@ -143,7 +143,7 @@ fi
 echo "computing tumor purity"
 arguments="working_directory=\"$WORK_DIR\" sample.name=\"$SAMPNAME\" file.name=\"$FILENAME\" analysis.type=\"fast\"";
 
-if R --vanilla -- slave --args $arguments < ${BASE_DIR}/programs/Clarity.v2.R > ${WORK_DIR}/purity.log; then
+if R --vanilla -- slave --args $arguments < ${BASE_DIR}/source/Clarity.v2.R > ${WORK_DIR}/purity.log; then
 	echo "Successfully ran purity analysis"
 else
 	error_exit " Clarity.v2.R crashed! aborting."
