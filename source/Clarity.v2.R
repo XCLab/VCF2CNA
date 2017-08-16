@@ -48,7 +48,7 @@ file.seg=paste("Result/", file.name, "_CONSERTING_Mapability_100.txt", sep="")
 # Create Analysis type to implement analysis on Full Conserting Runs ( "full")  vs VCF2CNA or EXOME ( "fast")
 #analysis.type="fast"
 
-source("../../programs/Clarity.fun.R")
+source("../../source/Clarity.fun.R")
 baf.window = 0
 
 if (analysis.type == "fast")
