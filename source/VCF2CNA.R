@@ -95,26 +95,17 @@ fun.help = function(mark.tmp, p.thresh)
     return(seg.chr)
 }
 
-get_value = function(diff, log, mark, threshold)
+get_threshold = function(diff1, log1, diff2, log2, threshold)
 {
-  final_threshold=threshold 
-  if( mark > 25)
+  final_threshold = threshold
+  abs_diff = abs(diff1 - diff2)
+  abs_log  = abs(log1 - log2)
+  
+  if( abs_diff > 8 & abs_log > 3)
   {
-    return(final_threshold)
-  }
-  if( diff > 8 & log > 3)
-  {
-    final_threshold=0.05
-    return(final_threshold)
+    final_threshold = threshold * 1e6
   }
   return(final_threshold)
-}
-
-get_threshold = function(diff1, log1, diff2, log2, mark1, mark2, threshold)
-{
-  p.val1 = get_value(diff1, log1, mark1, threshold)
-  p.val2 = get_value(diff2, log2, mark2, threshold)
-  return(max(p.val1, p.val2))   
 }
 
 find_merge_segments = function(mark.chr, step, overlap, p.thresh, type, debug)
@@ -173,7 +164,7 @@ find_merge_segments = function(mark.chr, step, overlap, p.thresh, type, debug)
          log_sig1  = mean(mark.chr$Log[Start[i]:(Start[i] + num.mark1[i] - 1)])
          diff_sig2 = mean(mark.chr$diff[Start[i + 1]:(Start[i + 1] + num.mark1[i + 1] -1)])
          log_sig2  = mean(mark.chr$Log[Start[i + 1]:(Start[i + 1] + num.mark1[i + 1] -1)])
-         t.lim[i]  = get_threshold(diff_sig1, log_sig1, diff_sig2, log_sig2, num.mark1[i], num.mark1[i + 1], p.thresh) 
+         t.lim[i]  = get_threshold(diff_sig1, log_sig1, diff_sig2, log_sig2, p.thresh) 
       }
       p.max.id = which(p.val == max(p.val))[1]
       
@@ -193,7 +184,7 @@ find_merge_segments = function(mark.chr, step, overlap, p.thresh, type, debug)
                log_sig1          = mean(mark.chr$Log[Start[p.max.id-1]:(num.mark1[p.max.id - 1] + Start[p.max.id-1] - 1)])
                diff_sig2         = mean(mark.chr$diff[Start[p.max.id]:(num.mark1[p.max.id] + Start[p.max.id] - 1)])
                log_sig2          = mean(mark.chr$Log[Start[p.max.id]:(num.mark1[p.max.id] + Start[p.max.id] - 1)])
-               t.lim[p.max.id-1] = get_threshold(diff_sig1, log_sig1, diff_sig2, log_sig2, num.mark1[p.max.id -1], num.mark1[p.max.id], p.thresh) 
+               t.lim[p.max.id-1] = get_threshold(diff_sig1, log_sig1, diff_sig2, log_sig2, p.thresh) 
             }
             if (p.max.id <= length(p.val))
             {
@@ -202,7 +193,7 @@ find_merge_segments = function(mark.chr, step, overlap, p.thresh, type, debug)
                log_sig1 = mean(mark.chr$Log[Start[p.max.id]:(num.mark1[p.max.id] + Start[p.max.id] - 1)])
                diff_sig2 = mean(mark.chr$diff[Start[p.max.id+1]:(num.mark1[p.max.id+1] + Start[p.max.id+1] - 1)])
                log_sig2 = mean(mark.chr$Log[Start[p.max.id+1]:(num.mark1[p.max.id+1] + Start[p.max.id+1] - 1)])
-               t.lim[p.max.id] = get_threshold(diff_sig1, log_sig1, diff_sig2, log_sig2, num.mark1[p.max.id], num.mark1[p.max.id + 1], p.thresh)
+               t.lim[p.max.id] = get_threshold(diff_sig1, log_sig1, diff_sig2, log_sig2, p.thresh)
             }  
             p.max.id = which(p.val == max(p.val))[1]
          }
@@ -217,7 +208,7 @@ find_merge_segments = function(mark.chr, step, overlap, p.thresh, type, debug)
 }  
 
 fun.chr = function(chr, step=20000, overlap = round(step/20), p.thresh=1e-9, debug=F) {
-	mark.chr = cn.D[which(cn.D$SoftChr == chr),]
+        mark.chr = cn.D[which(cn.D$SoftChr == chr),]
 	if (sum(cn.D$SoftChr == chr) == 0) return(NULL)
 	chr2 = mark.chr$Chr[1]
 
@@ -425,7 +416,8 @@ if (plotAI) {
     if (!file.exists(file.name)) {
 	num.test = 0
 	offset = array(0, 23)
-	for (i in 1:22) {
+	
+        for (i in 1:22) {
 	    num.mark = sum(ai$Chr==paste("chr", i, sep="")) - sum(is.nan(ai$AIDiff[which(ai$Chr==paste("chr", i, sep=""))]))
 	    num.test = num.test + num.mark^3/6 - num.mark^2/2 + num.mark/3
 	}
@@ -556,8 +548,6 @@ if (!setMap) {
 	    map.prefix = "../../mapability/hg19/"
 	}
     }
-    
-    #if (GRCh38) map.prefix = "/nfs_exports/genomes/1/PCGP/BucketIntermediate/XChen/Mapability/GRCh38/" #Waiting for the mapability track from UCSC
 }
 
 softChr = 1
@@ -630,9 +620,7 @@ chr.D = chr.D[which(chr.D$Mean > 0),]
 		norm.D = chr.D[which(chr.D$ChrPos > norm.seg[2] & chr.D$ChrPos <= norm.seg[3]),]
 	    }
 	} else {
-            print("prior to chr == norm.chr[1]")
 	    if (chr == norm.chr[1]) {
-                print("logic executed")
 	    	norm.D = chr.D
 	    } else {
 	    	if (sum(chr == norm.chr) > 0) {
@@ -660,7 +648,7 @@ if (norm.all) {
 } else {
      if (auto.ref) {
 	m1 = median(norm.D$Mean, na.rm=T)
-       norm.D = norm.D[which(norm.D$Mean <= 1.25 * m1),] #To remove the potential balanced duplication
+       norm.D = norm.D[which(norm.D$Mean <= 1.25 * m1),] 
      }
      m1 = median(norm.D$Mean, na.rm=T)
      cn.D$Mean = cn.D$Mean / median(norm.D$Mean, na.rm=T)
@@ -784,7 +772,6 @@ cn.D = cn.D[-rm.idx,]
     }
 rm(cn.lm1)
 if (!singleBAM) rm(cn.lm2)
-#if (!norm.all) rm(norm.D)
 gc(T)
 paste("Finishing correcting GC content for difference:", date())
 if (!setPThresh) {
@@ -829,16 +816,10 @@ if (forced | (!file.exists(file.name))) {
 
     seg.final[,-(1:4)] = round(seg.final[,-(1:4)] * 1000) / 1000
     
-    ####################################################################
-    #  Xiang wanted to remove length.ratio from the output of VCF2CNA  #
-    #  The following code block will remove length.ratio               #
-    ####################################################################
-
      drops <- c("length.ratio")
      tmp.final <- seg.final[ , !(names(seg.final) %in% drops)]
      seg.final <- tmp.final
 
-    print(names(seg.final))
     write.table(seg.final, file.name, col.names=TRUE,row.names=FALSE,sep="\t",quote=FALSE)
     seg.final$chrom[which(seg.final$chrom==23)] = "X"
     seg.final$chrom[which(seg.final$chrom==24)] = "Y"
@@ -852,14 +833,12 @@ if (!singleBAM) {
 }
 
 if (quality.merge) {
-    #if (unfilteredSV) file.final = paste(file.final, ".unfiltered", sep="")
     if (Male) {
 	system(paste("java.sh -cp ", code.dir, " CNVQualityMerge -c1", sv.file, "-seg", file.name, "-c2", file.final, "-ai", ai.file, "-male -checkDmeans", "-td", thresh.diff, "-tl", logthresh.diff, "-ts", ts))
     } else {
 	system(paste("java.sh -cp ", code.dir, " CNVQualityMerge -c1", sv.file, "-seg", file.name, "-c2", file.final, "-ai", ai.file, " -checkDmeans", "-td", thresh.diff, "-tl", logthresh.diff, "-tl", logthresh.diff, "-ts", ts))
     }
     file.name = paste(file.name, ts, ".QualityMerge", sep="")
-    #system(paste("/hpcf/apps/compbio/util-bash/bin/timestamp.sh", file.name))
     system(paste("java.sh -cp ", code.dir, " ReformatGeDI ", file.name))
 }
 seg.final = read.table(file.name, header=T)
