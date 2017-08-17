@@ -107,10 +107,10 @@ fi
 echo "running VCF2CNA script"
 arguments="SAMPLE=\"$FILENAME\" forced=T hg18=F working_directory=\"$WORK_DIR\"";
 
-if R --vanilla --slave --args $arguments < ${BASE_DIR}/source/CONSERTING-TARGET.R; then
+if R --vanilla --slave --args $arguments < ${BASE_DIR}/source/VCF2CNA.R; then
 	echo "Successfully ran segment analysis"
 else
-	error_exit "CONSERTING-TARGET.R crashed! aborting."
+	error_exit "VCF2CNA.R crashed! aborting."
 fi
 
 echo "running ai_plot_cnv.r"
