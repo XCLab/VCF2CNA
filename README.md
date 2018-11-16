@@ -13,7 +13,7 @@ What things you need to install the software and how to install them
 ```
 Linux Operating System
 Perl version 5.10.1 or greater
-R    version 3.0.1 or greater
+R    version 3.4.0 
 R    Packages: Tree, gplots, RColorBrewer, ggplot2, reshape2, grid
 Python version 2.7.12
 ```
