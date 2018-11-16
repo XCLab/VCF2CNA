@@ -41,4 +41,4 @@ python execute.py [FILENAME][FILEPATH][OUTPUT_DIRECTORY]
 
 ## Authors
 
-* **Daniel K. Putnam, Xiaotu Ma, Stephen V. Rice, Yu Liu, Jinghui Zhang, Xiang Chen** 
+* **Daniel K. Putnam, Xiaotu Ma, Stephen V. Rice, Yu Liu, Scott Newman, Jinghui Zhang, Xiang Chen** 
