@@ -15,6 +15,7 @@ Linux Operating System
 Perl version 5.10.1 or greater
 R    version 3.0.1 or greater
 R    Packages: Tree, gplots, RColorBrewer, ggplot2, reshape2, grid
+Python version 2.7.12
 ```
 
 ### Installing
@@ -33,7 +34,7 @@ bash extract.sh
 To run the application use the run.sh bash script
 
 ```
-bash run.sh [FILENAME][FILE_DIR][SEQ_TYPE (EXOME or WHOLEGENOME)
+python execute.py [FILENAME][FILEPATH][OUTPUT_DIRECTORY]
 ```
 
 ### Additional Information
