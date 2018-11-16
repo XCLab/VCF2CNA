@@ -33,16 +33,98 @@ sub ClassifyData
     $type = "VCF";
     return $type;
   }
-  if ( $line_array[0] eq 'TARGET_CASE_ID' && $line_elements == 40)
+
+  my $high20_chrCol  = -1;
+  my $high20_posCol  = -1;
+  my $high20_typeCol = -1;
+  my $high20_refCol  = -1;
+  my $high20_altCol  = -1;
+  my $high20_refCountCol = -1;
+  my $high20_altCountCol = -1;
+
+  my $maf_chrCol = -1;
+  my $maf_posCol = -1;
+  my $maf_typeCol = -1;
+  my $maf_refCol = -1;
+  my $maf_altCol = -1;
+  my $maf_refCountCol = -1;
+  my $maf_altCountCol = -1;
+
+  for ( my $i = 0; $i < $line_elements; $i++)
+  {
+    if ($line_array[$i] eq 'Chr')
+    {
+      $high20_chrCol = 1;
+    }
+    elsif( $line_array[$i] eq 'Chromosome')
+    {
+      $maf_chrCol = 1;
+    }
+    elsif( $line_array[$i] eq 'Pos')
+    {
+      $high20_posCol = 1;
+    }
+    elsif( $line_array[$i] eq 'Start_Position' or $line_array[$i] eq 'Start_position')
+    {
+      $maf_posCol = 1;
+    }
+    elsif( $line_array[$i] eq 'Type')
+    {
+      $high20_typeCol = 1;
+    }
+    elsif( $line_array[$i] eq 'Variant_Type' or $line_array[$i] eq 'VariantType')
+    {
+      $maf_typeCol = 1;
+    }
+    elsif( $line_array[$i] eq 'Chr_Allele')
+    {
+      $high20_refCol = 1;
+    }
+    elsif( $line_array[$i] eq 'Tumor_ReadCount_Alt')
+    {
+      $maf_refCol = 1;
+    }
+    elsif( $line_array[$i] eq 'Alternative_Allele')
+    {
+      $high20_altCol = 1;
+    }
+    elsif( $line_array[$i] eq 'Tumor_ReadCount_Total')
+    {
+      $maf_altCol = 1;
+    }
+    elsif( $line_array[$i] eq 'reference_normal_count')
+    {
+      $high20_refCountCol= 1;
+    }
+    elsif( $line_array[$i] eq 'Normal_ReadCount_Alt')
+    {
+      $maf_refCountCol= 1;
+    }
+    elsif( $line_array[$i] eq 'alternative_normal_count')
+    {
+      $high20_altCountCol= 1;
+    }
+    elsif( $line_array[$i] eq 'Normal_ReadCount_Total')
+    {
+      $maf_altCountCol= 1;
+    }
+  }
+
+  my $mafsum = $maf_chrCol + $maf_posCol + $maf_typeCol + $maf_refCol + $maf_altCol + $maf_refCountCol + $maf_altCountCol;
+  my $h20sum = $high20_chrCol + $high20_posCol + $high20_typeCol + $high20_refCol + $high20_altCol + $high20_refCountCol + $high20_altCountCol;
+
+  if ( $mafsum == 7)
   {
     $type = "MAF";
     return $type;
   }
-  if ( $line_array[0] eq 'NormalSample' && $line_elements == 45)
+
+  if ( $h20sum == 7)
   {
     $type = "HIGH20";
-    return $type;   
+    return $type;
   }
+  
   if ( $line_array[0] eq 'Chr'  && $line_array[1] eq 'Pos'  && $line_array[2] eq 'MinD' &&
        $line_array[3] eq 'TinD' && $line_array[4] eq 'MinN' && $line_array[5] eq 'TinN')
   {

@@ -130,7 +130,7 @@ arrange.panels<-function(chr.size.ifn,dt0,cnv,loh,maxcvg) {
             lines(c(themy.x,themy.x+maxX*0.002),c(yy[kk]+shrinkage*ll/5,yy[kk]+shrinkage*ll/5),lwd=3)
             text(themy.x+maxX*0.002,yy[kk]+shrinkage*ll/5,medd*ll/5,cex=3,pos=4)
           }
-          text(themy.x+maxX*0.01,yy[kk]+shrinkage*2.5/5,panel.lbl[kk],cex=4,pos=4)
+          text(themy.x+maxX*0.015,yy[kk]+shrinkage*2.5/5,panel.lbl[kk],cex=4,pos=4)
         }
       }
     }

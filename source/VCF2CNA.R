@@ -1,4 +1,5 @@
 require(tree)||stop("Package tree not available. Please install the package")
+print("Executing Copy Number analysis")
 DCODE="D"
 GCODE="G"
 gap.norm=T
@@ -10,7 +11,7 @@ thresh.diff=0.125
 GMean.thresh = 0.2
 gap.thresh = 1000
 LOH.chr = 1:22
-forced=F
+#forced=F
 plotRaw = F
 toPerm = F
 toRedraw = F
@@ -35,7 +36,7 @@ SV.toFilter = F
 SV.filter = 3
 setPThresh = F
 reDoSV = F
-hg18 = T
+#hg18 = T
 GRCh38 = F
 noLogWeight = T
 singleBAM = F
@@ -47,7 +48,6 @@ if (length(args) > 0) for (i in 1:length(args)) eval(parse(text=args[[i]]))
 ts = paste("_", format(Sys.time(), "%Y%m%d%H%M%S"), sep="")
 logthresh.diff=log2(1+thresh.diff)
 auto.ref = !(exists("norm.chr") | exists("norm.seg") | singleBAM)
-print(paste("Auto.ref", auto.ref))
 Male=F
 if (GRCh38) {
 	mapability = F
@@ -373,10 +373,6 @@ fun.chr.germline = function(chr, step=20000, overlap = round(step/20), p.thresh=
 
 ########## Main Program ##########
 
-if (exists("norm.chr")) print(norm.chr)
-if (exists("norm.seg")) print(norm.seg)
-if (exists("est.D")) print(est.D)
-
 ######### Set Working Directory ###########
 
 if (exists("working_directory")) {
@@ -384,7 +380,7 @@ if (exists("working_directory")) {
     code.dir = working_directory
 } else {
   print("The working directory must be set, Program will abort.")
-  q()
+  q(save= "no", status = 1, runLast = TRUE)
 }
 getwd()
 
@@ -403,10 +399,7 @@ if (length(chr.toScale) != length(chr.scale)) {
 
 ######### Compute Loss of Heterozygosity File ##########
 
-print(paste("SAMPLE", SAMPLE))
 file.name = paste(SAMPLE,".ai", sep="")
-
-print(paste("file.name", file.name))
 
 if (!file.exists(file.name)) plotAI=F
 if (plotAI) {
@@ -521,7 +514,6 @@ if (auto.ref) {
 	    norm.all = T
 	} else {
 	    loh = loh[id,]
-	    print(loh)
 	}
     }
 }  else {
@@ -531,21 +523,21 @@ if (auto.ref) {
 if (!setGC) {
     if (!exists("gc.prefix")) {
 	if (hg18) {
-	    gc.prefix = "../../gc/hg18/"
+	    gc.prefix = (paste(base_dir, "/gc/hg18/", sep=""))
 	} else {
-    	    gc.prefix = "../../gc/GRCh37/GRCh37-lite-"
+            gc.prefix = (paste(base_dir, "/gc/GRCh37/GRCh37-lite-", sep=""))
 	}
 	
-	if (GRCh38) gc.prefix = "../../gc/GRCh38/GRCh38-"
+	if (GRCh38) gc.prefix = (paste(base_dir, "/gc/GRCh38/GRCh38-", sep=""))
     }
 }
 
 if (!setMap) {
     if (!exists("map.prefix")) {
 	if (hg18) {
-	    map.prefix = "../../mapability/hg18/"
+	    map.prefix = (paste(base_dir, "/mapability/hg18/", sep=""))
 	} else {
-	    map.prefix = "../../mapability/hg19/"
+	    map.prefix = (paste(base_dir, "/mapability/hg19/", sep=""))
 	}
     }
 }
@@ -631,7 +623,6 @@ chr.D = chr.D[which(chr.D$Mean > 0),]
     }
     rm(chr.D)
     rm(gc)
-    print(paste(chr, softChr - 1, date()))
     if (debug | chr==5 | chr==13) print(gc(debug))
 }
 cn.orig=cn.D
@@ -800,7 +791,6 @@ file.final=""
 if (forced | (!file.exists(file.name))) {
     seg.final=NULL
     for (i in 1:numChr) {
-       print(paste("Chr",i,":    ",date()))
        if (debug) print(gc(T))
        if (singleBAM)  {
            seg.chr = fun.chr.germline(i, p.thresh=p.thresh)
@@ -842,6 +832,5 @@ if (quality.merge) {
     system(paste("java.sh -cp ", code.dir, " ReformatGeDI ", file.name))
 }
 seg.final = read.table(file.name, header=T)
-paste("Finishing building tree:", date())
 print(paste("Job completed:", date()))
 proc.time()
