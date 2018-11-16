@@ -355,7 +355,7 @@ print.purity.plot = TRUE
   # Extract all values with purity not set to NA 
   purity.set       <- subset(purity.answers, purity != "NA")
 
-  # Must have a minimum of 50 points to estimate purity
+  # Must have a minimum of 40 points to estimate purity
   if ( dim(purity.set)[1] < 40)
   {
     print("The algorithm cannot predict tumor purity for this sample")
