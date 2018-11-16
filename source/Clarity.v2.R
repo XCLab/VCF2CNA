@@ -30,7 +30,12 @@ if(length(args)==0){
     }
 }
 
-#working_directory="/home/dputnam/conserting-lite/client_rollout/SJNBL017195_D1_G1"
+#base_dir <- "/home/dputnam/vcf2cna"
+#working_directory <- "/home/dputnam/purity_benchmark/analyzed_files/wes/SJNBL011450_D1_G1"
+#sample.name <- "SJNBL011450_D1_G1"
+#file.name <- "SJNBL011450_D1_G1.high_20.out"
+#analysis.type <- "fast" 
+
 if ( exists("working_directory")) {
   setwd(working_directory)
 } else {
@@ -39,22 +44,23 @@ if ( exists("working_directory")) {
 }
 getwd()
 
-#sample.name="SJNBL017195_D1_G1"
-#file.name="SJNBL017195_D1_G1.high_20.out"
-
 file.baf=paste(sample.name, ".germ.baf", sep="")
 file.seg=paste("Result/", file.name, "_CONSERTING_Mapability_100.txt", sep="")
 
 # Create Analysis type to implement analysis on Full Conserting Runs ( "full")  vs VCF2CNA or EXOME ( "fast")
-#analysis.type="fast"
 
-source("../../source/Clarity.fun.R")
+function_file = (paste(base_dir, "/source/Clarity.fun.R", sep=""))
+
+source(function_file)
 baf.window = 0
+
 
 if (analysis.type == "fast")
 {
+  # Analysis type "fast" is for High20 files or VCF files
   baf.window = 300
 } else if ( analysis.type == "full") {
+  # Analysis type "full" is for counts derived from BAM files
   baf.window = 1000
 } else {
   print("Incorrect analysis type provided.  Please use either fast or full")
@@ -96,8 +102,8 @@ print.purity.plot = TRUE
       abs(sample.seg$GMean - weighted.gmean) < 0.1 &
       
       # Ensures single copy gain, copy neutral, and single copy loss samples
-      sample.seg$seg.mean < 0.55 &  
-      sample.seg$seg.mean > -0.55)
+      sample.seg$seg.mean < 0.60 &  
+      sample.seg$seg.mean > -0.60)
   } else {  # analysis.type == "full"
     id.seg = which(
     sample.seg$chrom < 23 &
@@ -115,14 +121,22 @@ print.purity.plot = TRUE
       abs(sample.seg$GMean - weighted.gmean) < 0.1 &
 
       # Ensures single copy gain, copy neutral, and single copy loss samples
-      sample.seg$seg.mean < 0.55 &
-      sample.seg$seg.mean > -0.55)
+      sample.seg$seg.mean < 0.60 &
+      sample.seg$seg.mean > -0.60)
   } 
 
   if( length(id.seg) == 0)
   {
-    print("There are no segments that meet selection criteria.  Are you using the correct analysis type for your data?")
-    quit(save = "no", status = 1, runLast = TRUE)
+    print("There are no segments that meet selection criteria. Purity cannot be estimated")
+    print( "final_purity: NA")
+    var.name <- paste("purity_", sample.name, sep="")
+    estimation <- paste(var.name, ".txt", sep="")
+    tmp.loc <- paste(working_directory, "/Result/", sep="")
+    purity.file.loc <- paste(tmp.loc, estimation, sep="")
+    fileConn<- file(purity.file.loc)
+    write("NA", fileConn)
+    close(fileConn)
+    quit(save = "no", status = 0, runLast = TRUE) 
   }
 
   if( print_id[1] == "all")
@@ -179,7 +193,7 @@ print.purity.plot = TRUE
 
 
     # IF total number of BAFS are less than baf.window (1000), skip to next iteration
-    if(baf.total < baf.window)
+    if(baf.total <= baf.window)
     {
       purity.baf.values    <- list(data.frame(purity = "NA", cna.mean = "NA", distance = "NA", chromosome = "NA", stringsAsFactors=FALSE)) 
       purity.list[[pos]]   <- purity.baf.values
@@ -341,11 +355,21 @@ print.purity.plot = TRUE
   # Extract all values with purity not set to NA 
   purity.set       <- subset(purity.answers, purity != "NA")
 
-  if ( dim(purity.set)[1] == 0)
+  # Must have a minimum of 50 points to estimate purity
+  if ( dim(purity.set)[1] < 40)
   {
     print("The algorithm cannot predict tumor purity for this sample")
+    num_points <- dim(purity.set)[1]
+    print(c("The number of data points is: ", num_points))
     print( "final_purity: NA")
-    quit(save = "no", status = 1, runLast = TRUE)
+    var.name <- paste("purity_", sample.name, sep="")
+    estimation <- paste(var.name, ".txt", sep="")
+    tmp.loc <- paste(working_directory, "/Result/", sep="")
+    purity.file.loc <- paste(tmp.loc, estimation, sep="")
+    fileConn<- file(purity.file.loc)
+    write("NA", fileConn)
+    close(fileConn)
+    quit(save = "no", status = 0, runLast = TRUE)
   }
   
   # Add new Type column to data frame based on cna.mean value
@@ -377,13 +401,37 @@ print.purity.plot = TRUE
   
   max_groupings <- max.clusters( length(purity.value), 5, 200)
 
-  purity.model = Mclust(purity.value, G=1:max_groupings)
-  result <- rbind(purity.model$parameters$pro, purity.model$parameters$mean)
-  print(c('result:' , result))
-  print(c('result[2,]:', result[2,]))
- 
-  # purity is the value of the maximum cluster
-  purity <- max(result[2,])
+  # This code handles the case where all the purity estimates are the same.
+  # This hardcodes max_groupings to 1
+  test_scalar = purity.value[1]
+  result_test = lapply(purity.value, function(x) x==test_scalar)
+  result.answers <- unlist(result_test, recursive = FALSE)
+  if ( any(result.answers == FALSE)) {
+    max_groupings <- max_groupings
+  } else {
+    max_groupings <- 1
+  }
+
+
+  if( max_groupings > 1) {
+    purity.model <- try(Mclust(purity.value, G=1:max_groupings))
+    while( class(purity.model) == "try-error"){
+      max_groupings <- max_groupings - 1
+      purity.model <- try(Mclust(purity.value, G=1:max_groupings))
+    }
+
+    print(c('max_groupings:', max_groupings))
+    result <- rbind(purity.model$parameters$pro, purity.model$parameters$mean)
+    print(c('result:' , result))
+    print(c('result[2,]:', result[2,]))
+
+    # purity is the value of the maximum cluster
+    purity <- max(result[2,])
+  }  else {
+    purity <- test_scalar
+  }
+
+  print(c('purity:', purity))
 
   var.name <- paste("purity_", sample.name, sep="")
   estimation <- paste(var.name, ".txt", sep="")

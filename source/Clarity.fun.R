@@ -97,7 +97,7 @@ create_density_plot <- function( title, heatmap_vector, left_point, right_point)
 
   p <- ggplot(dp, aes(x=row, y=heatmap_vector)) + 
        geom_point(shape=1) + 
-       geom_smooth( method=loess, span = 0.2, degree=2) + 
+       geom_smooth( method=loess, span = 0.2) + 
        geom_vline(colour = "black", xintercept = left_point) +
        annotate("text", x=left_point - 0.05, y=max_height, label=left_point) +  
        geom_vline(colour = "black", xintercept = right_point) + 
