@@ -354,9 +354,17 @@ print.purity.plot = TRUE
   
   # Extract all values with purity not set to NA 
   purity.set       <- subset(purity.answers, purity != "NA")
+  purity.set       <- subset(purity.set, purity >= 0.1)
+  
+  # Add new Type column to data frame based on cna.mean value
+  purity.set       <- within(purity.set, {Type = ifelse(cna.mean >=0, "Gain", "Loss")})
+  purity.set[purity.set$cna.mean == 0 & purity.set$purity > 0, "Type"] <- "CnLoh"
+  purity.set[purity.set$cna.mean > 0  & purity.set$distance == 0,"Type"] <- "BalAmp" 
 
-  # Must have a minimum of 40 points to estimate purity
-  if ( dim(purity.set)[1] < 40)
+  purity.set <- subset(purity.set, Type != "BalAmp")
+
+  # Must have a minimum of 20 points to estimate purity
+  if ( dim(purity.set)[1] < 20)
   {
     print("The algorithm cannot predict tumor purity for this sample")
     num_points <- dim(purity.set)[1]
@@ -372,10 +380,6 @@ print.purity.plot = TRUE
     quit(save = "no", status = 0, runLast = TRUE)
   }
   
-  # Add new Type column to data frame based on cna.mean value
-  purity.set       <- within(purity.set, {Type = ifelse(cna.mean >=0, "Gain", "Loss")})
-  purity.set[purity.set$cna.mean == 0 & purity.set$purity > 0, "Type"] <- "CnLoh"
-  purity.set[purity.set$cna.mean > 0  & purity.set$distance == 0,"Type"] <- "BalAmp" 
   
   # For Graphing add position variable to the data frame that is the length of the subset
   purity.pos       <- c(1:dim(purity.set)[1])
@@ -414,10 +418,10 @@ print.purity.plot = TRUE
 
 
   if( max_groupings > 1) {
-    purity.model <- try(Mclust(purity.value, G=1:max_groupings))
+    purity.model <- try(Mclust(purity.value, G=1:max_groupings, modelNames="E"))
     while( class(purity.model) == "try-error"){
       max_groupings <- max_groupings - 1
-      purity.model <- try(Mclust(purity.value, G=1:max_groupings))
+      purity.model <- try(Mclust(purity.value, G=1:max_groupings, modelNames="E"))
     }
 
     print(c('max_groupings:', max_groupings))
