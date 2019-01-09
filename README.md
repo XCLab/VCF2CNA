@@ -31,7 +31,7 @@ bash extract.sh
 
 ### Running the application
 
-To run the application use the run.sh bash script
+To run the application use the execute.py python script
 
 ```
 python execute.py [FILENAME][FILEPATH][OUTPUT_DIRECTORY]
