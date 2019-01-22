@@ -817,20 +817,5 @@ if (forced | (!file.exists(file.name))) {
 gc(T)
 
 seg.final = read.table(file.name, header=T)
-if (!singleBAM) {
-    id.Y = which(seg.final$chrom==24)
-    if (sum(seg.final$num.mark[id.Y] * seg.final$GMean[id.Y])/sum(seg.final$num.mark[id.Y]) > 0.2) Male = T
-}
-
-if (quality.merge) {
-    if (Male) {
-	system(paste("java.sh -cp ", code.dir, " CNVQualityMerge -c1", sv.file, "-seg", file.name, "-c2", file.final, "-ai", ai.file, "-male -checkDmeans", "-td", thresh.diff, "-tl", logthresh.diff, "-ts", ts))
-    } else {
-	system(paste("java.sh -cp ", code.dir, " CNVQualityMerge -c1", sv.file, "-seg", file.name, "-c2", file.final, "-ai", ai.file, " -checkDmeans", "-td", thresh.diff, "-tl", logthresh.diff, "-tl", logthresh.diff, "-ts", ts))
-    }
-    file.name = paste(file.name, ts, ".QualityMerge", sep="")
-    system(paste("java.sh -cp ", code.dir, " ReformatGeDI ", file.name))
-}
-seg.final = read.table(file.name, header=T)
 print(paste("Job completed:", date()))
 proc.time()
