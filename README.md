@@ -33,11 +33,33 @@ bash extract.sh
 
 To run the application use the execute.py python script
 
+## Mandatory Arguments
+|Argument       | Description               |
+|---------------|---------------------------|
+|FileName       | File to Analyze           |
+|FilePath       | Path to FileName          |
+|OutputDirectory| Path to store results     |
+
+
 ```
 python execute.py [FILENAME][FILEPATH][OUTPUT_DIRECTORY]
 ```
 
-### Additional Information
+### Additional Parameters
+
+|Argument       | Description                      | Default|
+|---------------|----------------------------------|--------|
+|VcfOrder       | Tumor/Normal TN or NT            | TN     |
+|Diploid Chr    | Chromosome used for normalization| -1     |      
+|StartChr       | Start location on Diploid Chr    | -1     |
+|EndChr         | End location on Diploid Chr      | -1     |
+|Median         | Median Normal Coverage           | -1     |
+|MinSf          | Minimum Scale Factor             | 0.50   | 
+|MaxSf          | Maximum Scale Factor             | 1.50   | 
+|XminSf         | Minimum X Scale Factor           | 0.25   |
+|XmaxSf         | Maximum X Scale Factor           | 1.50   |
+|R_Loc          | Path to R Program                | ""     |
+|R_ScriptLoc    | Path to RScript Program          | ""     |
 
 ## Authors
 
