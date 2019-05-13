@@ -40,6 +40,7 @@ To run the application use the execute.py python script
 |FilePath       | Path to FileName          |
 |OutputDirectory| Path to store results     |
 
+### Simple Commandline
 
 ```
 python execute.py [FILENAME][FILEPATH][OUTPUT_DIRECTORY]
