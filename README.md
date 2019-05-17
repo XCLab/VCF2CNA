@@ -55,10 +55,14 @@ Extract invidual xz files and combine them into one file
 sh extract_example.sh
 
 Run example data with default parameters
-python execute.py test.high_20.out ~/
+python execute.py test.high_20.out ~/test_data ~/example_output
+
+Run example data with user specified Diploid Chromosome
+python execute.py test.high_20.out ~/test_data ~/example_output -DiploidChr=13
+
+Run example data with user specified Region inside Chromosome
+python execute.py test.high_20.out ~/test_data ~/example_output -DiploidChr=13 -StartChr=19020701 -EndChr=26516137 
 ```
-
-
 
 ### Additional Parameters
 
