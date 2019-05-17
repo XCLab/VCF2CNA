@@ -51,7 +51,7 @@ python execute.py [FILENAME][FILEPATH][OUTPUT_DIRECTORY]
 ```
 Navigate to test data directory
 
-Extract invidual xz files and combine them into one file
+Extract individual xz files and combine them into one file
 sh extract_example.sh
 
 Run example data with default parameters
