@@ -46,6 +46,20 @@ To run the application use the execute.py python script
 python execute.py [FILENAME][FILEPATH][OUTPUT_DIRECTORY]
 ```
 
+### Run Example Data
+
+```
+Navigate to test data directory
+
+Extract invidual xz files and combine them into one file
+sh extract_example.sh
+
+Run example data with default parameters
+python execute.py test.high_20.out ~/
+```
+
+
+
 ### Additional Parameters
 
 |Argument       | Description                      | Default|
