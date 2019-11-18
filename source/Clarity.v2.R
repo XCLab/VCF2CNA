@@ -131,7 +131,7 @@ print.purity.plot = TRUE
     print( "final_purity: NA")
     var.name <- paste("purity_", sample.name, sep="")
     estimation <- paste(var.name, ".txt", sep="")
-    tmp.loc <- paste(working_directory, "/Result/", sep="")
+    tmp.loc <- "Result/", sep="")
     purity.file.loc <- paste(tmp.loc, estimation, sep="")
     fileConn<- file(purity.file.loc)
     write("NA", fileConn)
@@ -372,7 +372,7 @@ print.purity.plot = TRUE
     print( "final_purity: NA")
     var.name <- paste("purity_", sample.name, sep="")
     estimation <- paste(var.name, ".txt", sep="")
-    tmp.loc <- paste(working_directory, "/Result/", sep="")
+    tmp.loc <- "Result/", sep="")
     purity.file.loc <- paste(tmp.loc, estimation, sep="")
     fileConn<- file(purity.file.loc)
     write("NA", fileConn)
@@ -388,7 +388,7 @@ print.purity.plot = TRUE
   if( print.purity.plot)
   {
     data_plot <- create_purity_plot( purity.set)
-    tmp.loc <- paste(working_directory, "/Result/", sep="")
+    tmp.loc <- "Result/", sep="")
     print_purity_plot( data_plot, sample.name, tmp.loc)
   }
   
@@ -439,7 +439,7 @@ print.purity.plot = TRUE
 
   var.name <- paste("purity_", sample.name, sep="")
   estimation <- paste(var.name, ".txt", sep="")
-  tmp.loc <- paste(working_directory, "/Result/", sep="")
+  tmp.loc <- "Result/", sep="")
   purity.file.loc <- paste(tmp.loc, estimation, sep="")
   fileConn<- file(purity.file.loc)
   write(purity, fileConn)
