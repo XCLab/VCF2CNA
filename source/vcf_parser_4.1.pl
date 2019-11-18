@@ -22,8 +22,6 @@ my $vcf_file  = $ARGV[0];
 my $order     = $ARGV[1];
 my $work_dir  = $ARGV[2]; 
 
-$vcf_file = fileparse($vcf_file);
-
 # $_ is the default variable name
 # $ keeps track of the current line number
 
@@ -33,14 +31,13 @@ local $/ = "\n";
 # Create Output file
 my $output_file = "snvcounts_outputfile";
 my $basepath = $work_dir . "/" . $output_file;
-my $vcfpath  = $work_dir . "/" . $vcf_file;
 my $medianpath = $work_dir . "/median_outputfile";
 
 # Open filehandle for write access
 open(my $fh, '>>', $basepath);
 
 # Open filehandle for read access
-open my $filehandle, '<', $vcfpath;
+open my $filehandle, '<', $vcf_file;
 
 # Analysis will be set on chromsomes 1-22, X, and Y
 
